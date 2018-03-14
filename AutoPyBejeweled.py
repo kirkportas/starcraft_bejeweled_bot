@@ -5,6 +5,7 @@ import math
 from PIL import Image, ImageStat, ImageGrab
 import time
 from findmove import *
+from random import *
 #import getscreen
 
 # Game board
@@ -42,13 +43,16 @@ rgbdict = {
 
                    
 #Top left corner of game square
-xref, yref = 940, 105   #Pixel values on monitor
+# xref, yref = 940, 105   #Pixel values on monitor
+xref, yref = 1284, 118   #Pixel values on monitor
 global sqw, sqh, x1, y1
-sqw = 58  #58.375 in windowed on 1440x900 monitor
-sqh = 58
+
+sqw, sqh = 68, 68 #~67 in windowed on 1920x monitor
+# sqw = 58,sqh = 58  #58.375 in windowed on 1440x900 monitor
+# 
 #Middle of first square
-x1 = xref + 29
-y1 = yref + 29
+x1 = xref + (sqw/2)
+y1 = yref + (sqh/2)
         
 
 # for lists in dict
@@ -59,7 +63,8 @@ def main():
     while True:
         t0 = time.time()
         
-        while ((time.time()-t0) < 10 ): # limits time bot is run
+        minutesToRun = 5
+        while ((time.time()-t0) < minutesToRun*60 ): # limits time bot is run
             print('mainloopcounter')
             print('getscreen')
             getScreen()
@@ -89,7 +94,8 @@ def captureScreenshot():
 
 def getScreen():
     # Grab image and crop it to the desired window
-    box = (940, 105, 1407, 572)
+    box = (xref, yref, xref+8*xref, yref+8*yref) # 1827 659
+    # box = (940, 105, 1407, 572) # ORiginal default on 1440x980
     im = ImageGrab.grab().crop(box)
     #im.save('testcrop.jpg')
     
@@ -100,7 +106,7 @@ def getScreen():
             #each pieceim is a square holding the game piece
             piecebox = ( sqw*(x), sqh*(y), sqw*(x+1), sqh*(y+1))
             pieceim = im.crop(piecebox)
-            #pieceim.save('piececrop_xy_'+ str(x) + str(y) + '.jpg')
+            # pieceim.save('piececrop_xy_'+ str(x) + str(y) + '.jpg') # Save piece images to verify they're being cropped correctly 
             
             stats = ImageStat.Stat(pieceim)
             statsmean = stats.mean
@@ -142,13 +148,15 @@ def delay(length):
 def makeMove(fromLoc, toLoc):
     print(moveCounter,'from',fromLoc,'to',toLoc)
     autopy.mouse.move((fromLoc[0]*sqw)+x1,(fromLoc[1]*sqh)+y1)
+    
+    random_delay = randint(1, 200) 
     #mouse.move here above
     #delay(250)
-    delay(2300)
+    delay(604+ random_delay)
     autopy.mouse.click(True)
     #autopy.mouse.toggle(True)
     #delay(250) # too fast.
-    delay(2300) # Assumes prior click was successful. (85%+ it is)
+    delay(704+random_delay*2) # Assumes prior click was successful. (85%+ it is)
     try:
         # use smooth_move to emulate human mouse movement, less obviously a bot
         autopy.mouse.smooth_move(((toLoc[0]*sqw)+x1),((toLoc[1]*sqh)+y1)) 
